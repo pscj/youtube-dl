@@ -405,8 +405,8 @@ class FFmpegEmbedSubtitlePP(FFmpegPostProcessor):
         if not sub_langs:
             return [], information
 
-        input_files = [filename] + sub_filenames
-
+        input_files = [filename]
+        """
         opts = [
             '-map', '0',
             '-c', 'copy',
@@ -416,14 +416,16 @@ class FFmpegEmbedSubtitlePP(FFmpegPostProcessor):
             # Don't copy Apple TV chapters track, bin_data (see #19042, #19024,
             # https://trac.ffmpeg.org/ticket/6016)
             '-map', '-0:d',
-        ]
+        ]        
         if information['ext'] == 'mp4':
             opts += ['-c:s', 'mov_text']
         for (i, lang) in enumerate(sub_langs):
             opts.extend(['-map', '%d:0' % (i + 1)])
             lang_code = ISO639Utils.short2long(lang) or lang
             opts.extend(['-metadata:s:s:%d' % i, 'language=%s' % lang_code])
-
+        """
+        opts = []
+        opts.extend(['-vf','subtitles=%s' % sub_filenames[0]])
         temp_filename = prepend_extension(filename, 'temp')
         self._downloader.to_screen('[ffmpeg] Embedding subtitles in \'%s\'' % filename)
         self.run_ffmpeg_multiple_files(input_files, temp_filename, opts)
